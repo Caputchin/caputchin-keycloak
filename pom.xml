@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.caputchin</groupId>
+  <artifactId>caputchin-keycloak</artifactId>
+  <version>0.1.0</version> <!-- x-release-please-version -->
+  <packaging>jar</packaging>
+
+  <name>Caputchin Keycloak extension</name>
+  <description>Official Keycloak authenticator + form-action providers that gate login,
+    reset-credentials and registration with the Caputchin human-verification widget and
+    verify the returned token server-side.</description>
+  <url>https://github.com/Caputchin/caputchin-keycloak</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Caputchin</name>
+      <url>https://caputchin.com</url>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/Caputchin/caputchin-keycloak.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/Caputchin/caputchin-keycloak.git</developerConnection>
+    <url>https://github.com/Caputchin/caputchin-keycloak</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+    <!-- Build against the customer-pinned 26.0 line. The providers use only stable
+         SPI surfaces (HttpClientProvider, UsernamePasswordForm, ResetCredentialChooseUser,
+         FormAction) so the same JAR runs across the whole 26.x line; CI verifies the matrix. -->
+    <keycloak.version>26.0.8</keycloak.version>
+    <junit.version>5.10.2</junit.version>
+    <mockito.version>5.11.0</mockito.version>
+  </properties>
+
+  <dependencies>
+    <!-- Keycloak runtime provides all of these; never shade them into the JAR. -->
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-server-spi</artifactId>
+      <version>${keycloak.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-server-spi-private</artifactId>
+      <version>${keycloak.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-services</artifactId>
+      <version>${keycloak.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test only. -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>caputchin-keycloak</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <environmentVariables>
+            <!-- Exercises the env-var secret-sourcing path in SecretResolverTest. -->
+            <CAPUTCHIN_TEST_SECRET>test-secret-from-env</CAPUTCHIN_TEST_SECRET>
+          </environmentVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.1</version>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- Activated with -Prelease in CI to publish a signed artifact (plus sources and
+         javadoc) to Maven Central via the Sonatype Central Portal. Normal builds skip all
+         of this. -->
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.6.3</version>
+            <configuration>
+              <doclint>none</doclint>
+              <failOnError>false</failOnError>
+            </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.4</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.7.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>true</autoPublish>
+              <waitUntil>published</waitUntil>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

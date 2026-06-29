@@ -1,0 +1,2 @@
+com.caputchin.keycloak.authenticator.CaputchinUsernamePasswordFormFactory
+com.caputchin.keycloak.authenticator.CaputchinResetCredentialChooseUserFactory

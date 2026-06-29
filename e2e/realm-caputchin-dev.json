@@ -1,0 +1,212 @@
+{
+  "realm": "caputchin-dev",
+  "enabled": true,
+  "sslRequired": "none",
+  "loginTheme": "caputchin",
+  "registrationAllowed": true,
+  "resetPasswordAllowed": true,
+  "loginWithEmailAllowed": true,
+  "registrationEmailAsUsername": false,
+  "editUsernameAllowed": false,
+  "internationalizationEnabled": true,
+  "supportedLocales": ["en", "ar"],
+  "defaultLocale": "en",
+  "browserSecurityHeaders": {
+    "contentSecurityPolicy": "frame-src 'self' https://games.caputchin.com; frame-ancestors 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; connect-src 'self' http://localhost:3001 https://verify.caputchin.com https://games.caputchin.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; child-src 'self' blob:"
+  },
+  "users": [
+    {
+      "username": "tester",
+      "enabled": true,
+      "email": "tester@example.com",
+      "emailVerified": true,
+      "firstName": "Test",
+      "lastName": "User",
+      "credentials": [
+        { "type": "password", "value": "password", "temporary": false }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "caputchin-dev-client",
+      "name": "Caputchin dev test client",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "attributes": {
+        "pkce.code.challenge.method": ""
+      }
+    }
+  ],
+  "browserFlow": "browser-caputchin",
+  "resetCredentialsFlow": "reset-caputchin",
+  "registrationFlow": "registration-caputchin",
+  "authenticationFlows": [
+    {
+      "alias": "browser-caputchin",
+      "description": "Browser flow gated by a Caputchin challenge on the login page",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "flowAlias": "browser-caputchin-forms",
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": true
+        }
+      ]
+    },
+    {
+      "alias": "browser-caputchin-forms",
+      "description": "Username, password and Caputchin challenge",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "caputchin-username-password-form",
+          "authenticatorConfig": "caputchin-login-config",
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    },
+    {
+      "alias": "reset-caputchin",
+      "description": "Reset-credentials flow gated by a Caputchin challenge on the email entry page",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "caputchin-reset-choose-user",
+          "authenticatorConfig": "caputchin-reset-config",
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "reset-credential-email",
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "reset-password",
+          "requirement": "REQUIRED",
+          "priority": 30,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    },
+    {
+      "alias": "registration-caputchin",
+      "description": "Registration flow gated by a Caputchin challenge",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "flowAlias": "registration-caputchin-form",
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": true
+        }
+      ]
+    },
+    {
+      "alias": "registration-caputchin-form",
+      "description": "Registration form with a Caputchin challenge",
+      "providerId": "form-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "registration-user-creation",
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "caputchin-registration",
+          "authenticatorConfig": "caputchin-registration-config",
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "registration-password-action",
+          "requirement": "REQUIRED",
+          "priority": 30,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    }
+  ],
+  "authenticatorConfig": [
+    {
+      "alias": "caputchin-login-config",
+      "config": {
+        "siteKey": "__CPT_PUB__",
+        "secretKeyEnvVar": "CAPUTCHIN_SECRET",
+        "verifyHost": "http://host.docker.internal:3001",
+        "apiHost": "http://localhost:3001",
+        "widgetMode": "checkbox",
+        "size": "normal",
+        "locale": "kc",
+        "skin": "auto",
+        "failClosed": "true"
+      }
+    },
+    {
+      "alias": "caputchin-reset-config",
+      "config": {
+        "siteKey": "__CPT_PUB__",
+        "secretKeyEnvVar": "CAPUTCHIN_SECRET",
+        "verifyHost": "http://host.docker.internal:3001",
+        "apiHost": "http://localhost:3001",
+        "widgetMode": "checkbox",
+        "size": "normal",
+        "locale": "kc",
+        "skin": "auto",
+        "failClosed": "true"
+      }
+    },
+    {
+      "alias": "caputchin-registration-config",
+      "config": {
+        "siteKey": "__CPT_PUB__",
+        "secretKeyEnvVar": "CAPUTCHIN_SECRET",
+        "verifyHost": "http://host.docker.internal:3001",
+        "apiHost": "http://localhost:3001",
+        "widgetMode": "checkbox",
+        "size": "normal",
+        "locale": "kc",
+        "skin": "auto",
+        "failClosed": "true"
+      }
+    }
+  ]
+}

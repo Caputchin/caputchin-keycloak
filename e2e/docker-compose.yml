@@ -1,0 +1,39 @@
+name: caputchin-keycloak-e2e
+
+# Local dev Keycloak for the Caputchin extension, wired to the local Caputchin stack
+# (the caputchin-verify worker on :3001). Boots a real Keycloak 26.0 with the provider
+# JAR + the bundled `caputchin` login theme, and imports a realm whose browser,
+# reset-credentials and registration flows are gated by the Caputchin providers.
+#
+# Browser-side calls (loading the widget, bootstrap/verify) run on the host, so the realm
+# points the widget api-host at http://localhost:3001. The server-side siteverify call runs
+# inside this container, so it points verifyHost at http://host.docker.internal:3001.
+#
+# Provide a dev site key + secret in e2e/.env (CPT_PUB / CPT_SEC); mint one in the local
+# dashboard (:3000) and allowlist http://localhost:8081 on it. The secret is read by the
+# extension from the CAPUTCHIN_SECRET env var (secretKeyEnvVar), so it is never written into
+# the imported realm JSON.
+
+services:
+  keycloak:
+    build:
+      context: ..
+      dockerfile: e2e/Dockerfile
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      CAPUTCHIN_SECRET: ${CPT_SEC:-}
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - >
+        mkdir -p /opt/keycloak/data/import &&
+        sed "s|__CPT_PUB__|${CPT_PUB:-}|g"
+        /opt/keycloak/data/import-tmpl/realm-caputchin-dev.json
+        > /opt/keycloak/data/import/realm-caputchin-dev.json &&
+        exec /opt/keycloak/bin/kc.sh start-dev --import-realm --http-port=8081
+    ports:
+      - "8081:8081"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./realm-caputchin-dev.json:/opt/keycloak/data/import-tmpl/realm-caputchin-dev.json:ro
