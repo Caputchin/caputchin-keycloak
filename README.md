@@ -62,6 +62,13 @@ context attributes, and a Keycloakify example) is in [docs/theme-contract.md](do
 Bot protection is never applied to the direct-grant or client-credentials flows: there is no browser
 there, so a challenge cannot render and would break API token requests.
 
+## What is sent
+
+On each verification the extension calls `/siteverify` with three fields: your secret key, the
+token from the form, and `"integration": "keycloak"`. The last field names the extension, so
+Caputchin can count the site keys that verify through it. It never changes the verification
+result. Nothing about the visitor is added: not their IP address, browser or username.
+
 ## Local dev / try it
 
 `e2e/` boots a real Keycloak wired to a local Caputchin stack with one command. See
