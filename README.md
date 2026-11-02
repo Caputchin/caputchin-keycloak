@@ -31,8 +31,9 @@ The fastest path. A working, styled checkbox with no template editing.
 
 2. Realm Settings then Themes then **Login theme: `caputchin`**.
 
-3. Realm Settings then Security Defenses then Content Security Policy: paste the value from
-   [docs/csp.md](docs/csp.md).
+3. Realm Settings then Security Defenses then Headers: keep Keycloak's default
+   Content-Security-Policy. It works in every widget mode. If you run a stricter policy, use the
+   value in [docs/csp.md](docs/csp.md).
 
 4. Authentication then Flows. On the Browser flow, set the Username Password Form execution to
    **Caputchin Username Password Form**. Open its config (the gear) and set your **Site key** and a
