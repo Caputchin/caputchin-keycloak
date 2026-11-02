@@ -25,7 +25,10 @@ import java.util.Map;
  * Performs the server-side {@code POST /v1/siteverify} call against the Caputchin verify host using
  * Keycloak's pooled HTTP client.
  *
- * <p>The request body is JSON ({@code {"secret": ..., "response": ...}}); the response is JSON
+ * <p>The request body is JSON
+ * ({@code {"secret": ..., "response": ..., "integration": "keycloak"}}); the {@code integration} field
+ * names this extension so the platform can count the site keys verified through it, and carries nothing
+ * about the visitor. The response is JSON
  * ({@code {"success": bool, "error-codes": [...]}}). The secret is resolved per request and is never
  * logged. The pooled client is owned by Keycloak and is never closed here.
  */
@@ -33,6 +36,7 @@ public final class SiteverifyClient {
 
     private static final Logger LOG = Logger.getLogger(SiteverifyClient.class);
     private static final String VERIFY_PATH = "/v1/siteverify";
+    private static final String INTEGRATION = "keycloak";
 
     private SiteverifyClient() {
     }
@@ -57,6 +61,7 @@ public final class SiteverifyClient {
             Map<String, String> body = new LinkedHashMap<>();
             body.put("secret", secret);
             body.put("response", token);
+            body.put("integration", INTEGRATION);
 
             HttpPost post = new HttpPost(url);
             post.setHeader("Accept", "application/json");
