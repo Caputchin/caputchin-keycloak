@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/Caputchin/caputchin-keycloak/compare/caputchin-keycloak-v0.3.0...caputchin-keycloak-v0.3.1) (2026-11-04)
+
+
+### Bug Fixes
+
+* **build:** bump central-publishing-maven-plugin to 0.12.0 so Central accepts the bundle ([efaa31b](https://github.com/Caputchin/caputchin-keycloak/commit/efaa31b4be8fadbe991ea0369a4452a5179ea2ff))
+* **build:** bump central-publishing-maven-plugin to 0.12.0 so Central accepts the bundle ([512cb29](https://github.com/Caputchin/caputchin-keycloak/commit/512cb293bc02ac1909dd5738b9a12f01a7bde01f))
+
 ## [0.3.0](https://github.com/Caputchin/caputchin-keycloak/compare/caputchin-keycloak-v0.2.0...caputchin-keycloak-v0.3.0) (2026-11-02)
 
 
